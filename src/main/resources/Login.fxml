@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.PasswordField?>
@@ -8,7 +12,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="157.0" prefWidth="197.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.home.controller.LoginController">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="157.0" prefWidth="197.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.home.controller.LoginController">
    <children>
       <VBox prefHeight="126.0" prefWidth="197.0">
          <children>
@@ -23,6 +27,7 @@
             <StackPane prefHeight="37.0" prefWidth="200.0">
                <children>
                   <PasswordField fx:id="password" prefHeight="25.0" prefWidth="169.0" promptText="Password" />
+                  <ProgressIndicator visible="false" />
                </children>
                <VBox.margin>
                   <Insets left="15.0" right="15.0" />
@@ -30,7 +35,7 @@
             </StackPane>
             <StackPane prefHeight="37.0" prefWidth="200.0">
                <children>
-                  <TextField fx:id="url" prefHeight="25.0" prefWidth="169.0" promptText="PMC URL" />
+                  <TextField fx:id="url" prefHeight="25.0" prefWidth="169.0" promptText="http://pmc.test.com" />
                </children>
                <VBox.margin>
                   <Insets left="15.0" right="15.0" />
@@ -39,6 +44,7 @@
             <StackPane prefHeight="37.0" prefWidth="200.0">
                <children>
                   <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" prefHeight="25.0" prefWidth="169.0" text="Login" />
+                  <ProgressIndicator fx:id="progressIndicator" visible="false" />
                </children>
             </StackPane>
          </children>

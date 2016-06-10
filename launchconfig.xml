@@ -1,0 +1,4 @@
+<launch4jConfig>
+    <headerType>gui|console</headerType>
+    <outfile>file.exe</outfile>
+</launch4jConfig>

@@ -1,10 +1,16 @@
-function sleepFor( sleepDuration ){
-    var now = new Date().getTime();
-    while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
+function checkInputValueIs(inputs, value) {
+    for(var i = 0; i<inputs.length; i++) {
+    console.log($(inputs[i]).val()+ " = "+value)
+        if($(inputs[i]).val() != value) {
+                return false;
+        }
+    }
+    return true;
 }
 
 var activityName = "%activityName%";
 var time = "%time%";
-$("a:contains('"+activityName+"')").parents("tr.rwTask").next().find("td:not(.future, .description)").find("input").val(time).change();
-sleepFor(2000);
-
+var inputs = $("a:contains('"+activityName+"')").parents("tr.rwTask").next().find("td:not(.future, .description)").find("input");
+while(!checkInputValueIs(inputs, time)) {
+    inputs.val(time).change();
+}

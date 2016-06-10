@@ -1,22 +1,28 @@
 package com.home.controller;
 
+import static com.home.GlobalConstant.PROPERTY_NAME.LOGIN;
+import static com.home.GlobalConstant.PROPERTY_NAME.PASSWORD;
+import static com.home.GlobalConstant.PROPERTY_NAME.URL;
+import static javafx.scene.control.Alert.AlertType.ERROR;
+
 import com.home.AuthenticationException;
 import com.home.service.ConfigService;
 import com.home.service.PmcService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Properties;
 
-import static com.home.GlobalConstant.PROPERTY_NAME.*;
-import static javafx.scene.control.Alert.AlertType.ERROR;
+import javax.annotation.PostConstruct;
 
 @Component
 public class LoginController extends FXController {
@@ -28,6 +34,8 @@ public class LoginController extends FXController {
     private TextField url;
     @FXML
     private Button loginButton;
+    @FXML
+    private ProgressIndicator progressIndicator;
 
     @Autowired
     private PmcService pmcService;
@@ -51,21 +59,23 @@ public class LoginController extends FXController {
     public void login() {
         saveFields();
 
-        loginButton.setDisable(true);
+        progressIndicator.setVisible(true);
 
-        Platform.runLater(() -> {
+        new Thread(() -> {
             try {
                 pmcService.getActivitiesList();
-                mainController.show();
+                Platform.runLater(() -> mainController.show());
             } catch (AuthenticationException ex) {
-                Alert alert = new Alert(ERROR);
-                alert.setContentText("Fail check login data!");
-                alert.setHeaderText(null);
-                alert.show();
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(ERROR);
+                    alert.setContentText("Fail check login data!");
+                    alert.setHeaderText(null);
+                    alert.show();
+                });
+            } finally {
+                Platform.runLater(() -> progressIndicator.setVisible(false));
             }
-
-            loginButton.setDisable(false);
-        });
+        }).start();
     }
 
     private void saveFields() {

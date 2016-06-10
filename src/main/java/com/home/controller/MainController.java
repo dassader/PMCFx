@@ -6,9 +6,12 @@ import com.home.service.MessageService;
 import com.home.service.PmcService;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
+
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,6 +38,9 @@ public class MainController extends FXController {
 
     @FXML
     private CheckBox autorunCheck;
+
+    @FXML
+    private ProgressIndicator progressIndicator;
 
     @Autowired
     private PmcService pmcService;
@@ -64,10 +70,12 @@ public class MainController extends FXController {
     @Override
     public void show() {
         timeFiled.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.matches("\\d*")) {
-                timeFiled.setText(newValue);
-            } else {
-                timeFiled.setText(oldValue);
+            if(newValue != null) {
+                if (newValue.matches("\\d*")) {
+                    timeFiled.setText(newValue);
+                } else {
+                    timeFiled.setText(oldValue);
+                }
             }
         });
 
@@ -122,12 +130,7 @@ public class MainController extends FXController {
     }
 
     private void autorunUpdate(boolean selected) {
-        if (selected) {
-            String value = "javaw -jar \"" + System.getProperty("user.dir") + "\\"+getJarName()+"\"";
-            Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", APP_NAME, value);
-        } else {
-            Advapi32Util.registryDeleteValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", APP_NAME);
-        }
+
     }
 
     private String getJarName() {
@@ -139,18 +142,26 @@ public class MainController extends FXController {
     }
 
     public void fillTime() {
-        Properties properties = configService.load();
+        progressIndicator.setVisible(true);
 
-        pmcService.fillTime(properties.getProperty(TARGET_ACTIVITY), properties.getProperty(FILL_TIME));
-
-        if (Boolean.parseBoolean(properties.getProperty(SEND_MESSAGE_AFTER_FILL))) {
+        new Thread(() -> {
             try {
-                File file = pmcService.makeScreenShot();
-                messageService.sendReport(file);
-            } catch (MessagingException e) {
-                throw new RuntimeException("Fail send message!", e);
+                Properties properties = configService.load();
+
+                pmcService.fillTime(properties.getProperty(TARGET_ACTIVITY), properties.getProperty(FILL_TIME));
+
+                if (Boolean.parseBoolean(properties.getProperty(SEND_MESSAGE_AFTER_FILL))) {
+                    try {
+                        File file = pmcService.makeScreenShot();
+                        messageService.sendReport(file);
+                    } catch (MessagingException e) {
+                        throw new RuntimeException("Fail send message!", e);
+                    }
+                }
+            } finally {
+                Platform.runLater(() -> progressIndicator.setVisible(false));
             }
-        }
+        }).start();
     }
 
     private void initTargetBox() {

@@ -64,6 +64,10 @@ public class PmcServiceImpl implements PmcService {
 
         executeJavaScript(fillTimeScript);
 
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {}
+
         $(By.xpath("//input[@value='Save Changes']")).click();
 
         close();
